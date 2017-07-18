@@ -9,6 +9,8 @@ me mainly, but anyone is allowed to download the assets and use them in their ga
 
 There are still lots of unfinished scripts and weird bugs that are in the library, if you want something that doesn't suck, d̶o̶n̶'̶t̶ ̶u̶s̶e̶ ̶g̶a̶m̶e̶m̶a̶k̶e̶r̶, use another library :P
 
+If you are stuck on using the library, take a look at the code or check the wiki in the repo. I'm making an official website for CGLT soon.
+
 # Implementation
 Navigate to the extensions folder in gamemaker's hierachy and right click, select import extension and locate library, import all scripts. All the functions should work without any refrencing in the code.
 
