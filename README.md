@@ -2,7 +2,9 @@
 A gamemaker library.
 
 # What does it do?
-CGLT is a growing open source gamemaker library, it takes all the boring heavy work out of the way leaving you with easy to use methods to put in your games. UI elements and debug menus run straight out of the box. Best of all, I'm encouraging contributions.
+CGLT is a growing open source gamemaker library, it takes all the boring grunt work out of the way leaving you with easy to use methods to put in your games. UI elements, debug menus and file read and write templates run straight out of the box. Best of all, I'm encouraging contributions.
+
+Keep in mind, CGLT is no replacement for specialised concpets, it's there to serve as a quick fix solution.
 
 # Who uses this?
 me mainly, but anyone is allowed to download the assets and use them in their gamemaker games given that they give proper credit.
