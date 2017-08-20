@@ -163,6 +163,27 @@ else
     return false;
 }
 
+#define mouse_view_touching_rect
+/* 
+CGLT by Shenei
+You may freely use and modify CGLT, see github repo for more details
+*/
+
+var startx = argument0;
+var starty = argument1;
+var hitlength = argument2;
+var hitheight = argument3;
+var viewID = argument4;
+
+if (mouse_x >= startx + view_xview [viewID] && mouse_x <= startx + view_xview [viewID] + hitlength && mouse_y >= starty + view_yview [viewID] && mouse_y <= starty + hitheight + view_yview [viewID])
+{
+    return true;
+}
+else
+{
+    return false;
+}
+
 #define debug_drawfps
 /* 
 CGLT by Shenei
@@ -322,26 +343,240 @@ if (mouse_x >= xp && mouse_x <= xp + length && mouse_y >= yp && mouse_y <= yp + 
     }
 }
 
+#define ui_tooltip_rview
+/* 
+CGLT by Shenei
+You may freely use and modify CGLT, see github repo for more details
+*/
+
+var message = argument0;
+var startx = argument1;
+var starty = argument2;
+var hitlength = argument3;
+var hitheight = argument4;
+var textcolour = argument5;
+var boxcolour = argument6;
+var viewID = argument7;
+
+depth = -200
+
+xx = window_view_mouse_get_x(viewID);
+yy = window_view_mouse_get_y(viewID);
+
+if (mouse_view_touching_rect (startx, starty, hitlength, hitheight, viewID))
+{
+    if (xx + string_width (message) > window_get_width())
+    {
+        draw_set_color (boxcolour);
+        draw_rect (xx - string_width (message) - 25, yy + 25, string_width (message), string_height (message), true);
+        draw_set_color (textcolour);
+        draw_text (xx - string_width (message) - 25, yy + 25, message);
+    } 
+    else 
+    {
+        draw_set_color (boxcolour);
+        draw_rect (xx + 25, yy + 25, string_width (message), string_height (message), true);
+        draw_set_color (textcolour);
+        draw_text (xx + 25, yy + 25, message);
+    }
+    
+}
+
+
+
 #define forms_button
-
-
-#define io_makemouth
 
 
 #define readme
 /*
-CGLT's IO works on a mouth system.
-A mouth is able to spit and swallow. The library makes gamemaker data persistence
-easier and faster to use by spitting out data and swalling files.
+these scripts are really edgy, use them with caution.
+make sure to call leveleditor_init() at the create event of any object
+next, go into io_clearlevel and assign the with statements to whatever objects exist
+finally, fiddle with the code, the code that is currently written is so specific
+and is not really written for your needs. 
 
-io will also cover the tools to quickly create a level editor's file read and write
+remember, these scripts don't solve the problem, they only provide 
+the tools to make solving the problem easier.
+
+a rundown on what each of these methods do
+
+leveleditor_init initialises some global variables that the system is dependent on. make
+sure to call this in any create event or else none of these scripts can work.
+
+io_writelevel writes a file in the program's leveleditor subdirectory given some
+meta data. this script returns null.
+
+io_readlevel reads a specified file given the file name and returns a string array containing
+the level name in [0], the creator name in [1] and the difficulty name in [2]. it's main
+job is to assign variables preparing the system for io_importlevel
+
+io_importlevel actually implements the level given that variables are set using io_readlevel
+this script takes no arguments and returns null.
+
+io_clearlevel is called in io_importlevel, it simply clears all the blocks visually and
+in the leveldata array.
+
+these features are still very very experimental. find bugs and annoy me on discord over
+on https://discord.gg/bpF782r
 */
 
-#define io_spit
+#define leveleditor_init
+global.leveldata = ds_list_create();
+global.importdata = ds_list_create ();
+global.ii = 0;
+
+#define io_writelevel
+levelname = argument0;
+creator = argument1;
+difficulty = argument2;  
+
+//hwan v1
+
+if (!directory_exists ("editor"))
+{
+    directory_create ("editor");
+}
+  
+var level;
+level = file_text_open_write("editor\" + "level" + ".lvl");                 //todo, create custom level naming
+
+file_text_write_string(level, "hwan v1");
+file_text_writeln (level)
+file_text_writeln (level)
+
+//meta
+file_text_write_string(level, "[Meta]");
+file_text_writeln (level);
+file_text_write_string(level, "name: " + levelname);                          //name
+file_text_writeln (level);
+file_text_write_string(level, "creator: " + creator);                 //creator
+file_text_writeln (level);
+file_text_write_string(level, "difficulty " + difficulty);          //difficulty
+
+file_text_writeln (level)
+file_text_writeln (level)
+
+file_text_write_real (level, ds_list_size (global.leveldata));
+file_text_writeln (level);
+
+//gameplay
+file_text_write_string (level, "[Objects]");
+file_text_writeln (level)
+for (var i = 0; i < ds_list_size (global.leveldata); i++)
+{
+    file_text_write_real (level, ds_list_find_value(global.leveldata, i));
+    file_text_writeln (level)
+}
+file_text_write_string(level, "@"); 
+  
+file_text_close(level);
 
 
-#define io_swallow
+#define io_readlevel
+//hwan v1
 
+var readlevel = argument0;
+
+if (!file_exists ("editor\" + readlevel + ".lvl"))
+{
+    show_message ("an error occured, could not find " + readlevel);
+}
+else
+{       
+    //opens existing file
+    var level; 
+    level = file_text_open_read ("editor\" + readlevel + ".lvl");
+
+    //checks if file version is valid
+    if (file_text_read_string (level) == "hwan v1")
+    {
+        file_text_readln (level);
+        file_text_readln (level);
+        file_text_readln (level);   //skip meta tag
+        
+        //assign meta variables
+        levelname = string_delete (file_text_read_string (level), 1, 6);  
+        file_text_readln (level);
+        creator = string_delete (file_text_read_string (level), 1, 9);
+        file_text_readln (level);
+        difficulty = string_delete (file_text_read_string (level), 1, 11); 
+        
+        meta [0] = levelname;
+        meta [1] = creator;
+        meta [2] = difficulty;
+        
+        return meta;
+        
+        file_text_readln (level);
+        file_text_readln (level);
+        
+        //read objects
+        global.ii = file_text_read_real (level);
+        file_text_readln (level);
+                    
+        for (var i = 0; i < global.ii; i++)
+        {
+            var Lid = file_text_read_real (level);               //get ID
+            file_text_readln (level);
+            var Lx = file_text_read_real (level);                //get x
+            file_text_readln (level);
+            var Ly = file_text_read_real (level);                //get y
+            file_text_readln (level);
+            ds_list_add (global.importdata, Lid, Lx, Ly);        //add to list
+        }
+        
+        //close file
+        file_text_close (level);
+    }
+    else
+    {
+        show_message ("either you are running an outdated save or you come from the future to lend us a newer version of hwan");
+    }
+}
+
+
+#define io_clearlevel
+//unmute code when in use
+/*
+with () instance_destroy ();
+with () instance_destroy ();
+ds_list_clear (global.leveldata);
+
+#define io_importlevel
+ds_list_delete (global.importdata, 0);
+
+io_clearlevel();
+
+var stampblock;
+var a = 1;
+var b = 2;
+
+for (var i = 0; i < global.ii; i += 3)
+{   
+    
+    if (ds_list_find_value(global.importdata, i) == 1)
+    {
+        stampblock = object3;
+    }
+    else if (ds_list_find_value(global.importdata, i) == 2)
+    {
+        stampblock = object4; 
+    }
+    else 
+    {
+        stampblock = nothing;
+    }
+    
+    //show_message (ds_list_find_value (global.importdata, a));
+    
+    instance_create (
+                    ds_list_find_value (global.importdata, a), 
+                    ds_list_find_value (global.importdata, b), 
+                    stampblock
+                    );                    
+    a += 3;
+    b += 3;  
+}
 
 #define rpg_text
 var text = argument0;
