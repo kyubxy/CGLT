@@ -1,4 +1,4 @@
-#Currently discontinued (because screw gamemaker)
+# Currently discontinued (because screw gamemaker)
 
 # CGLT
 A gamemaker library.
